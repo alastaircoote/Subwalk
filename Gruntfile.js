@@ -57,7 +57,7 @@ module.exports = function (grunt) {
             options: {
                 port: 9000,
                 // change this to '0.0.0.0' to access the server from outside
-                hostname: 'localhost'
+                hostname: '0.0.0.0'
             },
             livereload: {
                 options: {
@@ -289,13 +289,21 @@ module.exports = function (grunt) {
                 cwd: '<%= yeoman.app %>/styles',
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
+            },
+            scripts: {
+                expand: true,
+                dot: true,
+                cwd: '<%= yeoman.app %>/scripts',
+                dest: '.tmp/scripts/',
+                src: '{,*/}*.js'
             }
         },
         concurrent: {
             server: [
                 'recess',
                 'coffee:dist',
-                'copy:styles'
+                'copy:styles',
+                'copy:scripts'
             ],
             test: [
                 'coffee',
@@ -329,7 +337,6 @@ module.exports = function (grunt) {
             'clean:server',
             'concurrent:server',
             'connect:livereload',
-            'open',
             'watch'
         ]);
     });
