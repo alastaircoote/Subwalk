@@ -34,7 +34,7 @@ module.exports = function (grunt) {
                 tasks: ['coffee:test']
             },
             recess: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+                files: ['<%= yeoman.app %>/styles/{,*/}*.less'],
                 tasks: ['recess:dist']
             },
             styles: {

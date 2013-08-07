@@ -33,7 +33,7 @@ define ["backbone","underscore","vendor/latlon"], (Backbone, _, LatLng) ->
 
 		_positionReceived: (e) =>
 			if @opts.distanceFilter && @lastUpdate
-				
+
 				lastLatLng = new LatLng(@lastUpdate.coords.latitude, @lastUpdate.coords.longitude)
 				newLatLng = new LatLng(e.coords.latitude, e.coords.longitude)
 				distance = lastLatLng.distanceTo(newLatLng) * 1000
