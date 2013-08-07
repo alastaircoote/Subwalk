@@ -1,4 +1,4 @@
-define ["geo/geolocator","async","jquery"] , (Geolocator,async,$) ->
+define ["geo/geolocator","async","jquery","geo/latlngbounds","vendor/latlon"] , (Geolocator,async,$,LatLngBounds,LatLng) ->
 
 	g = new Geolocator {distanceFilter: 50}
 
@@ -18,6 +18,15 @@ define ["geo/geolocator","async","jquery"] , (Geolocator,async,$) ->
 		location = results[0]
 		stations = results[1]
 
+		pos = new LatLng(location.coords.latitude, location.coords.longitude)
+
+		bounds = LatLngBounds.fromLatLng pos, 1000
+
+		nearby = stations.filter (s) ->
+			stationLL = new LatLng s.lat, s.lng
+			return bounds.contains(stationLL)
+
+		console.log nearby
 
 
 	
