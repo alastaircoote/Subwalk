@@ -1,0 +1,11 @@
+# Creator : Routino - http://www.routino.org/
+#
+#Latitude	Longitude	Section 	Section 	Total   	Total   	Point	Turn	Bearing	Highway
+#        	         	Distance	Duration	Distance	Duration	Type 	    	       	       
+ 40.754306	 -73.990674	 0.000 km	 0.0 min	  0.0 km	   0 min	Waypt		 +3	(null)
+ 40.753517	 -73.988787	 0.181 km	 0.2 min	  0.2 km	   0 min	Junct	 +2	 -3	(null)
+ 40.752895	 -73.989243	 0.079 km	 0.1 min	  0.3 km	   0 min	Junct	 +0	 -3	(null)
+ 40.752280	 -73.989694	 0.078 km	 0.1 min	  0.3 km	   0 min	Junct	 +0	 -3	(null)
+ 40.750997	 -73.990620	 0.162 km	 0.1 min	  0.5 km	   0 min	Junct	 +0	 -3	(null)
+ 40.749101	 -73.992006	 0.241 km	 0.2 min	  0.7 km	   1 min	Junct	 +2	 -1	(null)
+ 40.750053	 -73.994272	 0.218 km	 0.1 min	  1.0 km	   1 min	Waypt			

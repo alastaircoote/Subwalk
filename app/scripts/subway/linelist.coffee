@@ -29,9 +29,9 @@ define [
 
 				if !@stops then return # We don't have stop data yet
 
-				# Get 1km bounding box
+				# Get 0.8km bounding box
 				pos = new LatLng(@loc.coords.latitude, @loc.coords.longitude)
-				bounds = LatLngBounds.fromLatLng pos, 1000
+				bounds = LatLngBounds.fromLatLng pos, 800
 
 				# Find stations that are within this bounding box
 				@nearbyStations = @stops.filter((s) -> bounds.contains(s.latlng)).sort (a,b) ->
@@ -42,13 +42,22 @@ define [
 			_getStationData: () =>
 				newStations = @nearbyStations.filter (s) => !LineList.savedTimes[s.code]
 
+				suffix = "WKD"
+				day = new Date().getDay()
+				if day == 0 then suffix = "SUN"
+				else if day == 6 then suffix = "SAT"
+
+
 				async.map newStations, (station,cb) ->
 					$.ajax
-						url: "/data/times/#{station.code}_WKD.json.gz"
+						url: "/data/times/#{station.code}_#{suffix}.json.gz"
 						dataType: "json"
 						success: (data) ->
 							cb(null,{code: station.code, times: data})
+						error: () ->
+							cb("Could not fetch")
 				, (err,results) =>
+					if err then return console.log err
 					for r in results
 						LineList.savedTimes[r.code] = r.times
 
@@ -93,8 +102,6 @@ define [
 
 							
 							finalStations[time.route] = station
-
-				console.log finalStations
 
 				@trigger "stationsLocated", @nearbyStations.filter (s) -> s.routesToTrack
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Routino" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.topografix.com/GPX/1/1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<metadata>
+<desc>Creator : Routino - http://www.routino.org/</desc>
+<copyright author="Based on OpenStreetMap data from http://www.openstreetmap.org/">
+<license>http://www.openstreetmap.org/copyright</license>
+</copyright>
+</metadata>
+<rte>
+<name>Shortest route</name>
+<desc>Shortest route between &apos;start&apos; and &apos;finish&apos; waypoints</desc>
+<rtept lat="40.754306" lon="-73.990674"><name>START</name>
+<desc>South-East on &apos;West 38th Street&apos; for 0.181 km, 0.2 min</desc></rtept>
+<rtept lat="40.753517" lon="-73.988787"><name>TRIP001</name>
+<desc>South-West on &apos;7th Avenue&apos; for 0.079 km, 0.1 min</desc></rtept>
+<rtept lat="40.752895" lon="-73.989243"><name>TRIP002</name>
+<desc>South-West on &apos;7th Avenue&apos; for 0.078 km, 0.1 min</desc></rtept>
+<rtept lat="40.752280" lon="-73.989694"><name>TRIP003</name>
+<desc>South-West on &apos;7th Avenue&apos; for 0.162 km, 0.1 min</desc></rtept>
+<rtept lat="40.750997" lon="-73.990620"><name>TRIP004</name>
+<desc>South-West on &apos;Penn Plaza&apos; for 0.241 km, 0.2 min</desc></rtept>
+<rtept lat="40.749101" lon="-73.992006"><name>TRIP005</name>
+<desc>North-West on &apos;West 31st Street&apos; for 0.218 km, 0.1 min</desc></rtept>
+<rtept lat="40.750053" lon="-73.994272"><name>FINISH</name>
+<desc>Total Journey 1.0 km, 1 minutes</desc></rtept>
+</rte>
+</gpx>
