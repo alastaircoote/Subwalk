@@ -2,17 +2,26 @@ define [
 	"vendor/leaflet"
 	"geo/latlngbounds"
 	"utils/anim"
-	], (L,LatLngBounds,RequestAnimFrame) ->
+	"backbone"
+	"views/buttonlayer"
+	"subway/colors"
+	], (L,LatLngBounds,RequestAnimFrame, Backbone,ButtonLayer,SubwayColors) ->
 	class MainMap
 		constructor: () ->
+			_.extend(@, Backbone.Events)
+
+			@el = $('#main-map')
+
 			@map = L.map('main-map', {
-				dragging: false
-				touchZoom: false
+				dragging: true
+				touchZoom: true
 				zoomControl: false
 				doubleClickZoom: false
 				attributionControl: false
 				scrollWheelZoom: false
 			}).fitBounds(new L.LatLngBounds([40.794, -73.920], [40.686, -74.029]))
+
+			@map.options.zoomAnimationThreshold = 9999
 
 			L.tileLayer('http://{s}.tiles.mapbox.com/v3/alastaircoote.map-xgyabfvz/{z}/{x}/{y}.png', {
 			    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -21,35 +30,90 @@ define [
 
 
 		updateTrackingLocation: (e) =>
-			return @map.panTo [e.coords.latitude, e.coords.longitude], {animate:true}
-			###
-			bounds = LatLngBounds.fromLatLng([e.coords.latitude, e.coords.longitude], e.coords.accuracy)
-			console.log bounds
-			llBounds = new L.LatLngBounds [bounds.ne._lat, bounds.ne._lon], [bounds.sw._lat, bounds.sw._lon]
-			console.log llBounds
-			@map.fitBounds llBounds
-			###
+			#return @map.panTo [e.coords.latitude, e.coords.longitude], {animate:true}
+			
+		expandAndGoToBounds: (bounds) =>
+
+			# We want to resize the map (smaller), so the bounds we calculate need to be bigger than
+			# what we actually want
+
+			startZoom = @map.getBoundsZoom bounds, false 
+
+			amount = $(window).height() * 0.75
+
+			nePx = @map.project bounds.getNorthEast(), startZoom
+			swPx = @map.project bounds.getSouthWest(), startZoom
+		
+			nePx = nePx.subtract [0,amount]
+			swPx = swPx.add [0,(amount)]
+
+			finalNe = @map.unproject nePx, startZoom
+			finalSw = @map.unproject swPx, startZoom
+
+			nb = new L.LatLngBounds finalSw, finalNe
+
+			@map.once "zoomend", () =>
+				# Fix for weird Chrome not panning issue
+				@map.panBy([1,1])
+				#@trigger "zoomedToPosition"
+				#@el.css "webkit-transform", "translate3d(0,-#{amount}px,0)"
+
+			@map.setView nb.getCenter(), @map.getBoundsZoom(nb, false), {animate:true}
 
 		zoomToStations: (stations) =>
 			stationPoints = stations.map (s) -> [s.lat, s.lng]
 
 			stationBounds = new L.LatLngBounds stationPoints
+			@isZooming = true
+			@map.once "zoomend", () =>
+				@isZooming = false
+			
 
-			@map.fitBounds stationBounds, {animate:true}
+		addRoutes: (routes,stations) =>
+	
+			allPoints = []
 
-		addRoutes: (routes) =>
-			@lines = []
-			for route in routes
+			routes.forEach (route) ->
+				for step in route
+					allPoints.push [step.latitude, step.longitude]
+
+			allBounds = new L.LatLngBounds allPoints
+
+			@map.once "zoomend", () =>
+				@lines = []
+				if @isZooming
+					
+					# If we're zooming, don't do the draw. It doesn't work right.
+
+					@map.once "zoomend", () =>
+						@addRoutes(routes,stations)
+					return
+
 				
-				points = route.map (step) ->
-					return [step.latitude, step.longitude]
 
-				line = new L.Polyline(points, {color:"white",clickable:false, dashArray:[0,999999]})
-				@lines.push line
+				for route, i in routes
+					
+					station = stations[i]
 
-				line.addTo(@map)
+					points = route.map (step) ->
+						return [step.latitude, step.longitude]
 
-			@animateLines()
+					line = new L.Polyline(points, {color:"white",clickable:false, dashArray:[0,999999]})
+					circle = new ButtonLayer(points[points.length-1], station.routesToTrack.map (r) -> SubwayColors[r])
+
+					@lines.push
+						line: line
+						circle: circle
+
+					line.addTo(@map)
+					@map.addLayer circle
+					
+
+				
+
+				@animateLines()
+
+			@expandAndGoToBounds(allBounds)
 
 		animateLines: () =>
 
@@ -58,56 +122,36 @@ define [
 			# Set up our objects
 			toIterate = @lines.map (l) ->
 				return {
-					path: l._path
-					length: l._path.getTotalLength()
+					path: l.line._path
+					length: l.line._path.getTotalLength()
+					circle: l.circle
 				}
 
 			# Find the longest length- this will last the full duration
 			maxLength = Math.max(toIterate.map((l) -> l.length)...)
 
-			console.log "max length is " + maxLength
-
 			toIterate.forEach (l) ->
 				l.duration = Math.round (l.length / maxLength) * idealDuration
 
 			startTime = Date.now().valueOf()
-			console.log toIterate
 			
-			doAnimate = () ->
+			doAnimate = () =>
 
 				durationSoFar = Date.now().valueOf() - startTime
-				console.log "duration", durationSoFar
 				for line in toIterate
-					if line.duration < durationSoFar then continue
+					if line.duration - 50  < durationSoFar && !line.circle.isActive
+						line.circle.goActive()
 
 					progress = durationSoFar / line.duration
-					console.log "progress", progress
-
+					
 					drawLength = line.length * progress
-					stillLeft = line.length - drawLength
+					stillLeft = line.length - drawLength + 10
 
 					$(line.path).attr "stroke-dasharray", [drawLength,stillLeft].join(",")
 
 				if durationSoFar < idealDuration
 					RequestAnimFrame(doAnimate)
-
-			doAnimate()
-			return
-
-			lineLength = Math.ceil(line._path.getTotalLength())
-
-			$(line._path).attr "stroke-dasharray", "0," + lineLength
-			
-			startTime = Date.now().valueOf()
-			targetTime = startTime + 2000
-			doAnimate = () ->
-				soFar = Date.now().valueOf() - startTime
-				percent = Math.floor((soFar / 2000) * 100)
-				drawLength = lineLength * (percent / 100)
-				stillLeft = lineLength - drawLength
-
-				
-
-				if percent < 100 then RequestAnimFrame(doAnimate)
+				else
+					@trigger "linesDrawn"
 
 			doAnimate()

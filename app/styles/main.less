@@ -2,6 +2,9 @@
 
 body {
     background:#000;
+    position: relative;
+    margin:0;
+    padding:0;
 }
 
 #main-map {
@@ -10,10 +13,57 @@ body {
     left:0;
     width:100%;
     height:100%;
+    background: #000;
+    -webkit-transition: -webkit-transform 0.5s ease-in;
 
-    path {
-    	//stroke-dasharray: 0, 99999;
-    	-webkit-transition: stroke-dasharray 2s ease-in;
+    &.moveup {
+        -webkit-transform: translate3d(0,-25%,0)
+
     }
 }
 
+@-webkit-keyframes bouncein {
+    0% {
+        -webkit-transform: rotate(-90deg) scale(0,0);
+    }
+
+    25% {
+        -webkit-transform: rotate(180deg) scale(1.25,1.25);
+    }
+
+
+
+    100% {
+        -webkit-transform: rotate(90deg) scale(1,1);
+    }
+}
+
+.subwaybutton {
+    -webkit-transform: scale(0,0);
+    //-webkit-transition: -webkit-transform 0.3s ease-in;
+
+    &.active {
+        //-webkit-transform: rotate(90deg) scale(1,1);
+        -webkit-animation-duration: 0.5s;
+        -webkit-animation-name: bouncein;
+        -webkit-animation-iteration-count:1;
+        -webkit-animation-fill-mode: forwards;
+    }
+}
+
+#stop-list {
+    height: 65%;
+    width:100%;
+    background: #000 url("../images/asfalt_@2X.jpg");
+    background-size: 465px 350px;
+    position: absolute;
+    top:35%;
+    left:0%;
+    -webkit-transform: translate3d(0,100%,0);
+    -webkit-transition: -webkit-transform 0.5s ease-in;
+    box-shadow: -10px 0px 7px #000;
+
+    &.show {
+        -webkit-transform: translate3d(0,0,0);
+    }
+}
